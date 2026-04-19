@@ -20,12 +20,14 @@ export default function ProductsPage() {
     | "gift_set"
     | null;
 
+  // ✅ FIXED (important)
   const [activeCategory, setActiveCategory] = useState<
     "soap" | "candle" | "gift_set" | undefined
   >(categoryParam || undefined);
 
   const [page, setPage] = useState(1);
 
+  // ✅ FIXED QUERY
   const { data, isLoading } = trpc.product.list.useQuery({
     category: activeCategory,
     page,
@@ -34,6 +36,7 @@ export default function ProductsPage() {
 
   const { addToCart } = useCart();
 
+  // ✅ FIXED HANDLER
   function handleCategoryChange(cat: string) {
     const value =
       cat === "" ? undefined : (cat as "soap" | "candle" | "gift_set");
@@ -48,11 +51,8 @@ export default function ProductsPage() {
     }
   }
 
-  // ✅ FINAL FIX (IMPORTANT)
-  const apiData = (data as any)?.result?.data || data;
-
-  const products = apiData?.items || [];
-  const totalPages = apiData?.totalPages || 1;
+  const products = data?.items || [];
+  const totalPages = data?.totalPages || 1;
 
   return (
     <div
@@ -115,9 +115,8 @@ export default function ProductsPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {products.map((product: any) => (
+                {products.map((product) => (
                   <div key={product.id}>
-                    {/* ✅ FIXED LINK SYNTAX */}
                     <Link to={/products/${product.id}}>
                       <img
                         src={product.image}
@@ -132,7 +131,7 @@ export default function ProductsPage() {
 
                     <button
                       onClick={() => addToCart(product.id)}
-                      className="mt-2 bg-[#1B4332] text-white px-3 py-1 flex items-center gap-2"
+                      className="mt-2 bg-[#1B4332] text-white px-3 py-1"
                     >
                       <ShoppingBag size={14} /> Add
                     </button>
