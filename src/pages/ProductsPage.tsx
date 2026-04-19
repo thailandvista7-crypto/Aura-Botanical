@@ -48,15 +48,20 @@ export default function ProductsPage() {
     }
   }
 
-  const products = data?.items || [];
-  const totalPages = data?.totalPages || 1;
+  // ✅ CORRECT DATA ACCESS (FINAL FIX)
+  console.log("TRPC DATA:", data);
+
+  const products = data?.items ?? [];
+  const totalPages = data?.totalPages ?? 1;
 
   return (
     <div className="min-h-screen" style={{ background: "#FFF8F0", paddingTop: 80 }}>
-      {/* HEADER */}
+      {/* Header */}
       <div
         className="py-20 px-[5vw] text-center"
-        style={{ background: "linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)" }}
+        style={{
+          background: "linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)",
+        }}
       >
         <h1
           className="text-[#FFF8F0]"
@@ -67,24 +72,26 @@ export default function ProductsPage() {
         >
           Botanical Collection
         </h1>
-
-        <p className="text-[#FFF8F0]/70 mt-4">
-          Discover our handcrafted soaps, candles, and gift sets.
+        <p
+          className="text-[#FFF8F0]/70 text-[16px] mt-4 max-w-xl mx-auto"
+          style={{ fontFamily: "'DM Sans', sans-serif" }}
+        >
+          Discover our full range of handcrafted Thai soaps, aromatic candles, and curated gift sets.
         </p>
       </div>
 
-      {/* FILTERS */}
-      <div className="py-8 px-[5vw] border-b">
-        <div className="flex gap-4">
+      {/* Filters */}
+      <div className="py-8 px-[5vw] border-b border-[#F5F5F0]">
+        <div className="max-w-[1400px] mx-auto flex gap-6 overflow-x-auto">
           {categories.map((cat) => (
             <button
               key={cat.value}
               onClick={() => handleCategoryChange(cat.value)}
-              className={`px-3 py-1 border ${
+              className={`text-[13px] uppercase tracking-[0.1em] pb-2 border-b-2 ${
                 activeCategory === cat.value ||
                 (!activeCategory && cat.value === "")
-                  ? "bg-[#1B4332] text-white"
-                  : ""
+                  ? "text-[#1B4332] border-[#1B4332]"
+                  : "text-[#5C3D2E]/60 border-transparent"
               }`}
             >
               {cat.label}
@@ -93,63 +100,68 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* PRODUCTS */}
-      <div className="py-10 px-[5vw]">
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : products.length === 0 ? (
-          <p className="text-center">No products found.</p>
-        ) : (
-          <div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {products.map((product) => (
-                <div key={product.id}>
-                  <Link to={/products/${product.id}}>
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-[250px] object-cover rounded"
-                    />
-                  </Link>
+      {/* Products */}
+      <div className="py-16 px-[5vw]">
+        <div className="max-w-[1400px] mx-auto">
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : products.length === 0 ? (
+            <p className="text-center">No products found.</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {products.map((product: any) => (
+                  <div key={product.id}>
+                    <Link to={/products/${product.id}}>
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-[250px] object-cover rounded"
+                      />
+                    </Link>
 
-                  <h3 className="mt-2">{product.name}</h3>
+                    <h3 className="mt-2 font-semibold">{product.name}</h3>
 
-                  <p>{"$" + (product.price / 100).toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">
+                      ${(product.price / 100).toFixed(2)}
+                    </p>
+
+                    <button
+                      onClick={() => addToCart(product.id)}
+                      className="mt-2 bg-[#1B4332] text-white px-3 py-1 flex items-center gap-2"
+                    >
+                      <ShoppingBag size={14} />
+                      Add
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-10 gap-2">
+                  <button onClick={() => setPage((p) => Math.max(1, p - 1))}>
+                    <ChevronLeft />
+                  </button>
+
+                  {[...Array(totalPages)].map((_, i) => (
+                    <button key={i} onClick={() => setPage(i + 1)}>
+                      {i + 1}
+                    </button>
+                  ))}
 
                   <button
-                    onClick={() => addToCart(product.id)}
-                    className="mt-2 bg-[#1B4332] text-white px-3 py-1 flex items-center gap-2"
+                    onClick={() =>
+                      setPage((p) => Math.min(totalPages, p + 1))
+                    }
                   >
-                    <ShoppingBag size={14} /> Add
+                    <ChevronRight />
                   </button>
                 </div>
-              ))}
-            </div>
-
-            {/* PAGINATION */}
-            {totalPages > 1 && (
-              <div className="flex justify-center mt-10 gap-2">
-                <button onClick={() => setPage((p) => Math.max(1, p - 1))}>
-                  <ChevronLeft />
-                </button>
-
-                {[...Array(totalPages)].map((_, i) => (
-                  <button key={i} onClick={() => setPage(i + 1)}>
-                    {i + 1}
-                  </button>
-                ))}
-
-                <button
-                  onClick={() =>
-                    setPage((p) => Math.min(totalPages, p + 1))
-                  }
-                >
-                  <ChevronRight />
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
