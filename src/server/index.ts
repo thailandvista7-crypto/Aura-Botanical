@@ -5,11 +5,11 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import jwt from "jsonwebtoken";
-import { db } from "@/db";
-import { users } from "@/db/schema";
+import { db } from "../db";
+import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
-import { appRouter } from "@/trpc/routers/_app";
-import { createContext } from "@/trpc/trpc";
+import { appRouter } from "../trpc/routers/_app";
+import { createContext } from "../trpc/trpc";
 
 const JWT_SECRET = process.env.JWT_SECRET || "aura-botanicals-secret-key-2024";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
