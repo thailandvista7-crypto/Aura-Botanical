@@ -17,6 +17,9 @@ import {
   Droplets,
   Flame,
   Shield,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -125,7 +128,6 @@ export default function HomePage() {
     ],
   };
 
-  // ✅ Call the SEO hook – this was missing
   useSEO({
     title: "Aura Botanicals | Handmade Thai Soaps & Natural Candles – Artisanal Wellness",
     description: "Discover authentic Thai artisanal soaps and candles. Handcrafted with lemongrass, jasmine, coconut, and pure essential oils. 100% natural, cruelty-free, made in Chiang Mai.",
@@ -139,6 +141,7 @@ export default function HomePage() {
     <main>
       <SkipToContent />
       <HeroSection />
+      <ProductCarousel />
       <FeaturedProducts />
       <WhyChooseUs />
       <IngredientsDeepDive />
@@ -250,7 +253,111 @@ function HeroSection() {
   );
 }
 
-/* ─────────────── Featured Products ─────────────── */
+/* ─────────────── Product Carousel (below hero) ─────────────── */
+function ProductCarousel() {
+  const { data } = trpc.product.featured.useQuery();
+  const { addToCart } = useCart();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const products = data || [];
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+    const scrollAmount = 320;
+    const newScrollLeft = scrollRef.current.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
+    scrollRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+  };
+
+  if (products.length === 0) return null;
+
+  return (
+    <section className="py-16 px-[5vw] bg-white" aria-labelledby="carousel-heading">
+      <div className="max-w-[1400px] mx-auto">
+        <div className="text-center mb-8">
+          <h2 id="carousel-heading" className="text-[#5C3D2E] text-[28px] md:text-[36px] font-serif">
+            Bestselling Botanicals
+          </h2>
+          <p className="text-[#5C3D2E]/70">Our community's favourite Thai spa essentials</p>
+        </div>
+
+        <div className="relative group">
+          <button
+            onClick={() => scroll('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
+            aria-label="Previous products"
+          >
+            <ChevronLeft className="w-6 h-6 text-[#1B4332]" />
+          </button>
+
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto gap-6 scroll-smooth snap-x snap-mandatory scrollbar-hide pb-4"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {products.map((product) => (
+              <div key={product.id} className="flex-none w-[280px] sm:w-[300px] snap-start group/item">
+                <Link to={`/products/${product.id}`} className="block">
+                  <div className="relative overflow-hidden rounded-lg aspect-[3/4] mb-4 bg-[#F5F5F0]">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover/item:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                </Link>
+                <p className="text-[#1B4332] text-[11px] uppercase tracking-[0.15em] mb-1">
+                  {product.category}
+                </p>
+                <Link to={`/products/${product.id}`}>
+                  <h3 className="text-[#5C3D2E] text-[18px] mb-1 group-hover/item:text-[#1B4332] transition-colors">
+                    {product.name}
+                  </h3>
+                </Link>
+                <div className="flex items-center justify-between">
+                  <p className="text-[#5C3D2E] text-[16px] font-medium">
+                    ${(product.price / 100).toFixed(2)}
+                  </p>
+                  <button
+                    onClick={() => addToCart(product.id)}
+                    className="text-[#1B4332] hover:text-[#5C3D2E] transition-colors"
+                    aria-label={`Add ${product.name} to cart`}
+                  >
+                    <ShoppingBag size={18} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => scroll('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
+            aria-label="Next products"
+          >
+            <ChevronRight className="w-6 h-6 text-[#1B4332]" />
+          </button>
+        </div>
+
+        <div className="text-center mt-8">
+          <Link
+            to="/products"
+            className="inline-flex items-center gap-2 text-[#1B4332] text-[13px] uppercase tracking-[0.1em] hover:underline"
+          >
+            Shop All <ArrowRight size={16} />
+          </Link>
+        </div>
+      </div>
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </section>
+  );
+}
+
+/* ─────────────── Featured Products (original grid) ─────────────── */
 function FeaturedProducts() {
   const { data } = trpc.product.featured.useQuery();
   const { addToCart } = useCart();
@@ -437,7 +544,7 @@ function WhyChooseUs() {
   );
 }
 
-/* ─────────────── Ingredients Deep Dive (SEO) ─────────────── */
+/* ─────────────── Ingredients Deep Dive ─────────────── */
 function IngredientsDeepDive() {
   return (
     <section className="py-20 px-[5vw] bg-white" aria-labelledby="ingredients-heading">
@@ -510,7 +617,7 @@ function IngredientsDeepDive() {
   );
 }
 
-/* ─────────────── How It's Made (SEO) ─────────────── */
+/* ─────────────── How It's Made ─────────────── */
 function HowItsMade() {
   return (
     <section className="py-20 px-[5vw] bg-[#F5F5F0]" aria-labelledby="process-heading">
@@ -646,7 +753,7 @@ function PhilosophySection() {
   );
 }
 
-/* ─────────────── Benefits of Natural Skincare (SEO) ─────────────── */
+/* ─────────────── Benefits of Natural Skincare ─────────────── */
 function BenefitsOfNatural() {
   return (
     <section className="py-20 px-[5vw] bg-white" aria-labelledby="benefits-heading">
@@ -738,8 +845,10 @@ function TestimonialsSection() {
   );
 }
 
-/* ─────────────── FAQ Section (SEO & Rich Results) ─────────────── */
+/* ─────────────── FAQ Section with Toggle (Accordion) ─────────────── */
 function FaqSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   const faqs = [
     {
       q: "Are Aura Botanicals products vegan?",
@@ -763,6 +872,10 @@ function FaqSection() {
     },
   ];
 
+  const toggle = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
     <section className="py-20 px-[5vw] bg-[#F5F5F0]" aria-labelledby="faq-heading">
       <div className="max-w-[1000px] mx-auto">
@@ -773,11 +886,28 @@ function FaqSection() {
           </h2>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {faqs.map((faq, idx) => (
-            <div key={idx} className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="text-[#1B4332] text-lg font-serif mb-2">{faq.q}</h3>
-              <p className="text-[#5C3D2E]/80 text-sm leading-relaxed">{faq.a}</p>
+            <div key={idx} className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <button
+                onClick={() => toggle(idx)}
+                className="w-full flex justify-between items-center p-6 text-left focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20"
+                aria-expanded={openIndex === idx}
+              >
+                <h3 className="text-[#1B4332] text-lg font-serif">{faq.q}</h3>
+                <ChevronDown
+                  className={`w-5 h-5 text-[#5C3D2E] transition-transform duration-300 ${
+                    openIndex === idx ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              <div
+                className={`px-6 transition-all duration-300 ease-in-out ${
+                  openIndex === idx ? 'max-h-96 pb-6' : 'max-h-0'
+                } overflow-hidden`}
+              >
+                <p className="text-[#5C3D2E]/80 text-sm leading-relaxed">{faq.a}</p>
+              </div>
             </div>
           ))}
         </div>
