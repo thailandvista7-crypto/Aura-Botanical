@@ -20,14 +20,12 @@ export default function ProductsPage() {
     | "gift_set"
     | null;
 
-  // ✅ FIX: undefined instead of ""
   const [activeCategory, setActiveCategory] = useState<
     "soap" | "candle" | "gift_set" | undefined
   >(categoryParam || undefined);
 
   const [page, setPage] = useState(1);
 
-  // ✅ FIX: correct query
   const { data, isLoading } = trpc.product.list.useQuery({
     category: activeCategory,
     page,
@@ -36,7 +34,6 @@ export default function ProductsPage() {
 
   const { addToCart } = useCart();
 
-  // ✅ FIX: handler
   function handleCategoryChange(cat: string) {
     const value =
       cat === "" ? undefined : (cat as "soap" | "candle" | "gift_set");
@@ -55,17 +52,11 @@ export default function ProductsPage() {
   const totalPages = data?.totalPages || 1;
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ background: "#FFF8F0", paddingTop: 80 }}
-    >
+    <div className="min-h-screen" style={{ background: "#FFF8F0", paddingTop: 80 }}>
       {/* HEADER */}
       <div
         className="py-20 px-[5vw] text-center"
-        style={{
-          background:
-            "linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)",
-        }}
+        style={{ background: "linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)" }}
       >
         <h1
           className="text-[#FFF8F0]"
@@ -109,11 +100,10 @@ export default function ProductsPage() {
         ) : products.length === 0 ? (
           <p className="text-center">No products found.</p>
         ) : (
-          <>
+          <div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {products.map((product) => (
                 <div key={product.id}>
-                  {/* ✅ FIXED LINK */}
                   <Link to={/products/${product.id}}>
                     <img
                       src={product.image}
@@ -124,7 +114,7 @@ export default function ProductsPage() {
 
                   <h3 className="mt-2">{product.name}</h3>
 
-                  <p>${(product.price / 100).toFixed(2)}</p>
+                  <p>{"$" + (product.price / 100).toFixed(2)}</p>
 
                   <button
                     onClick={() => addToCart(product.id)}
@@ -139,9 +129,7 @@ export default function ProductsPage() {
             {/* PAGINATION */}
             {totalPages > 1 && (
               <div className="flex justify-center mt-10 gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                >
+                <button onClick={() => setPage((p) => Math.max(1, p - 1))}>
                   <ChevronLeft />
                 </button>
 
@@ -160,7 +148,7 @@ export default function ProductsPage() {
                 </button>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
