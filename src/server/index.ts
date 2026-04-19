@@ -5,36 +5,37 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import jwt from "jsonwebtoken";
+
 import { db } from "../db";
 import { users, products } from "../db/schema";
 import { eq } from "drizzle-orm";
+
 import { appRouter } from "../trpc/routers/_app";
 import { createContext } from "../trpc/trpc";
 
-const JWT_SECRET =
-  process.env.JWT_SECRET || "aura-botanicals-secret-key-2024";
-
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || "";
-
 const app = express();
 
-/* ================= CORS ================= */
+const JWT_SECRET =
+  process.env.JWT_SECRET || "aura-botanicals-secret-key";
+
+/* ================= MIDDLEWARE ================= */
+
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? true
-        : "http://localhost:3000",
+    origin: true,
     credentials: true,
   })
 );
 
 app.use(cookieParser());
-app.use(passport.initialize());
 app.use(express.json());
+app.use(passport.initialize());
 
 /* ================= GOOGLE AUTH ================= */
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || "";
+
 if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
   passport.use(
     new GoogleStrategy(
@@ -60,6 +61,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
               .insert(users)
               .values({ email, name, avatar })
               .returning();
+
             user = result[0];
           }
 
@@ -90,7 +92,6 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
 
       res.cookie("auth_token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
       });
 
@@ -100,6 +101,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
 }
 
 /* ================= tRPC ================= */
+
 app.use(
   "/api/trpc",
   createExpressMiddleware({
@@ -108,7 +110,8 @@ app.use(
   })
 );
 
-/* ================= SEED ================= */
+/* ================= SEED PRODUCTS ================= */
+
 app.post("/api/seed", async (_req, res) => {
   try {
     const existing = await db.select().from(products);
@@ -153,20 +156,13 @@ app.post("/api/seed", async (_req, res) => {
 });
 
 /* ================= HEALTH ================= */
+
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-/* ================= SERVE FRONTEND ================= */
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static("dist"));
-
-  app.get("*", (_req, res) => {
-    res.sendFile("dist/index.html", { root: "." });
-  });
-}
-
 /* ================= START SERVER ================= */
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
