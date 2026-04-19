@@ -22,7 +22,10 @@ const app = express();
 /* ================= CORS ================= */
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin:
+      process.env.NODE_ENV === "production"
+        ? true
+        : "http://localhost:3000",
     credentials: true,
   })
 );
@@ -70,7 +73,9 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
 
   app.get(
     "/api/auth/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+    })
   );
 
   app.get(
@@ -85,7 +90,8 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
 
       res.cookie("auth_token", token, {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
       });
 
       res.redirect("/");
@@ -105,9 +111,9 @@ app.use(
 /* ================= SEED ================= */
 app.post("/api/seed", async (_req, res) => {
   try {
-    const existingProducts = await db.select().from(products);
+    const existing = await db.select().from(products);
 
-    if (existingProducts.length === 0) {
+    if (existing.length === 0) {
       await db.insert(products).values([
         {
           name: "Lavender Soap",
@@ -151,9 +157,18 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-/* ================= SERVER ================= */
+/* ================= SERVE FRONTEND ================= */
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("dist"));
+
+  app.get("*", (_req, res) => {
+    res.sendFile("dist/index.html", { root: "." });
+  });
+}
+
+/* ================= START SERVER ================= */
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log(✅ Server running on http://localhost:${PORT});
+  console.log(Server running on http://localhost:${PORT});
 });
