@@ -46,7 +46,16 @@ export default function ProductsPage() {
               <h3>{product.name}</h3>
               <p>${(product.price / 100).toFixed(2)}</p>
 
-              <button>
+              <button
+                style={{
+                  marginTop: 8,
+                  padding: "6px 10px",
+                  background: "#1B4332",
+                  color: "#fff",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
                 <ShoppingBag size={14} /> Add
               </button>
             </div>
