@@ -125,7 +125,7 @@ export default function HomePage() {
     ],
   };
 
-  // SEO hook to inject meta tags and structured data
+  // ✅ Call the SEO hook – this was missing
   useSEO({
     title: "Aura Botanicals | Handmade Thai Soaps & Natural Candles – Artisanal Wellness",
     description: "Discover authentic Thai artisanal soaps and candles. Handcrafted with lemongrass, jasmine, coconut, and pure essential oils. 100% natural, cruelty-free, made in Chiang Mai.",
