@@ -48,9 +48,6 @@ export default function ProductsPage() {
     }
   }
 
-  // ✅ CORRECT DATA ACCESS (FINAL FIX)
-  console.log("TRPC DATA:", data);
-
   const products = data?.items ?? [];
   const totalPages = data?.totalPages ?? 1;
 
@@ -72,28 +69,16 @@ export default function ProductsPage() {
         >
           Botanical Collection
         </h1>
-        <p
-          className="text-[#FFF8F0]/70 text-[16px] mt-4 max-w-xl mx-auto"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          Discover our full range of handcrafted Thai soaps, aromatic candles, and curated gift sets.
+        <p className="text-[#FFF8F0]/70 mt-4">
+          Discover our handcrafted Thai products.
         </p>
       </div>
 
       {/* Filters */}
-      <div className="py-8 px-[5vw] border-b border-[#F5F5F0]">
-        <div className="max-w-[1400px] mx-auto flex gap-6 overflow-x-auto">
+      <div className="py-6 px-[5vw]">
+        <div className="flex gap-4">
           {categories.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => handleCategoryChange(cat.value)}
-              className={`text-[13px] uppercase tracking-[0.1em] pb-2 border-b-2 ${
-                activeCategory === cat.value ||
-                (!activeCategory && cat.value === "")
-                  ? "text-[#1B4332] border-[#1B4332]"
-                  : "text-[#5C3D2E]/60 border-transparent"
-              }`}
-            >
+            <button key={cat.value} onClick={() => handleCategoryChange(cat.value)}>
               {cat.label}
             </button>
           ))}
@@ -101,68 +86,54 @@ export default function ProductsPage() {
       </div>
 
       {/* Products */}
-      <div className="py-16 px-[5vw]">
-        <div className="max-w-[1400px] mx-auto">
-          {isLoading ? (
-            <p>Loading...</p>
-          ) : products.length === 0 ? (
-            <p className="text-center">No products found.</p>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {products.map((product: any) => (
-                  <div key={product.id}>
-                    <Link to={/products/${product.id}}>
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-[250px] object-cover rounded"
-                      />
-                    </Link>
+      <div className="px-[5vw] pb-16">
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : products.length === 0 ? (
+          <p>No products found</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {products.map((product: any) => (
+              <div key={product.id}>
+                {/* ✅ FIXED LINK */}
+                <Link to={/products/${product.id}}>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-[200px] object-cover"
+                  />
+                </Link>
 
-                    <h3 className="mt-2 font-semibold">{product.name}</h3>
+                <h3>{product.name}</h3>
+                <p>${(product.price / 100).toFixed(2)}</p>
 
-                    <p className="text-sm text-gray-600">
-                      ${(product.price / 100).toFixed(2)}
-                    </p>
-
-                    <button
-                      onClick={() => addToCart(product.id)}
-                      className="mt-2 bg-[#1B4332] text-white px-3 py-1 flex items-center gap-2"
-                    >
-                      <ShoppingBag size={14} />
-                      Add
-                    </button>
-                  </div>
-                ))}
+                <button onClick={() => addToCart(product.id)}>
+                  <ShoppingBag size={14} /> Add
+                </button>
               </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex justify-center mt-10 gap-2">
-                  <button onClick={() => setPage((p) => Math.max(1, p - 1))}>
-                    <ChevronLeft />
-                  </button>
-
-                  {[...Array(totalPages)].map((_, i) => (
-                    <button key={i} onClick={() => setPage(i + 1)}>
-                      {i + 1}
-                    </button>
-                  ))}
-
-                  <button
-                    onClick={() =>
-                      setPage((p) => Math.min(totalPages, p + 1))
-                    }
-                  >
-                    <ChevronRight />
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 pb-10">
+          <button onClick={() => setPage((p) => Math.max(1, p - 1))}>
+            <ChevronLeft />
+          </button>
+
+          {[...Array(totalPages)].map((_, i) => (
+            <button key={i} onClick={() => setPage(i + 1)}>
+              {i + 1}
+            </button>
+          ))}
+
+          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
+            <ChevronRight />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
