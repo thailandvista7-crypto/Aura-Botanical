@@ -48,19 +48,23 @@ export default function ProductsPage() {
     }
   }
 
-  // ✅ CORRECT DATA ACCESS (FINAL FIX)
-  console.log("TRPC DATA:", data);
+  // ✅ FINAL FIX (IMPORTANT)
+  const apiData = (data as any)?.result?.data || data;
 
-  const products = data?.items ?? [];
-  const totalPages = data?.totalPages ?? 1;
+  const products = apiData?.items || [];
+  const totalPages = apiData?.totalPages || 1;
 
   return (
-    <div className="min-h-screen" style={{ background: "#FFF8F0", paddingTop: 80 }}>
+    <div
+      className="min-h-screen"
+      style={{ background: "#FFF8F0", paddingTop: 80 }}
+    >
       {/* Header */}
       <div
         className="py-20 px-[5vw] text-center"
         style={{
-          background: "linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)",
+          background:
+            "linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)",
         }}
       >
         <h1
@@ -76,7 +80,8 @@ export default function ProductsPage() {
           className="text-[#FFF8F0]/70 text-[16px] mt-4 max-w-xl mx-auto"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
-          Discover our full range of handcrafted Thai soaps, aromatic candles, and curated gift sets.
+          Discover our full range of handcrafted Thai soaps, aromatic candles,
+          and curated gift sets.
         </p>
       </div>
 
@@ -112,6 +117,7 @@ export default function ProductsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {products.map((product: any) => (
                   <div key={product.id}>
+                    {/* ✅ FIXED LINK SYNTAX */}
                     <Link to={/products/${product.id}}>
                       <img
                         src={product.image}
@@ -120,18 +126,15 @@ export default function ProductsPage() {
                       />
                     </Link>
 
-                    <h3 className="mt-2 font-semibold">{product.name}</h3>
+                    <h3 className="mt-2">{product.name}</h3>
 
-                    <p className="text-sm text-gray-600">
-                      ${(product.price / 100).toFixed(2)}
-                    </p>
+                    <p>${(product.price / 100).toFixed(2)}</p>
 
                     <button
                       onClick={() => addToCart(product.id)}
                       className="mt-2 bg-[#1B4332] text-white px-3 py-1 flex items-center gap-2"
                     >
-                      <ShoppingBag size={14} />
-                      Add
+                      <ShoppingBag size={14} /> Add
                     </button>
                   </div>
                 ))}
@@ -140,7 +143,9 @@ export default function ProductsPage() {
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex justify-center mt-10 gap-2">
-                  <button onClick={() => setPage((p) => Math.max(1, p - 1))}>
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  >
                     <ChevronLeft />
                   </button>
 
