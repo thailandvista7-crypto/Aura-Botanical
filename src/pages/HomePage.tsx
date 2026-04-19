@@ -125,48 +125,31 @@ export default function HomePage() {
     ],
   };
 
-  return (
-    <>
-      <Helmet>
-        <title>Aura Botanicals | Handmade Thai Soaps & Natural Candles – Artisanal Wellness</title>
-        <meta
-          name="description"
-          content="Discover authentic Thai artisanal soaps and candles. Handcrafted with lemongrass, jasmine, coconut, and pure essential oils. 100% natural, cruelty-free, made in Chiang Mai."
-        />
-        <meta
-          name="keywords"
-          content="Thai soap, natural candles, handmade soap Thailand, lemongrass soap benefits, jasmine rice candle, artisanal bath products, vegan skincare Chiang Mai, cold process soap, essential oil candles"
-        />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://aurabotanicals.com" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://aurabotanicals.com/" />
-        <meta property="og:title" content="Aura Botanicals – Thai Artisanal Soaps & Candles" />
-        <meta property="og:description" content="Handcrafted botanical luxuries from the heart of Thailand." />
-        <meta property="og:image" content="https://aurabotanicals.com/images/og-image.jpg" />
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content="https://aurabotanicals.com/" />
-        <meta property="twitter:title" content="Aura Botanicals – Thai Artisanal Soaps & Candles" />
-        <meta property="twitter:description" content="Handcrafted botanical luxuries from the heart of Thailand." />
-        <meta property="twitter:image" content="https://aurabotanicals.com/images/og-image.jpg" />
-        <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
-      </Helmet>
+  // SEO hook to inject meta tags and structured data
+  useSEO({
+    title: "Aura Botanicals | Handmade Thai Soaps & Natural Candles – Artisanal Wellness",
+    description: "Discover authentic Thai artisanal soaps and candles. Handcrafted with lemongrass, jasmine, coconut, and pure essential oils. 100% natural, cruelty-free, made in Chiang Mai.",
+    keywords: "Thai soap, natural candles, handmade soap Thailand, lemongrass soap benefits, jasmine rice candle, artisanal bath products, vegan skincare Chiang Mai, cold process soap, essential oil candles",
+    canonicalUrl: "https://aurabotanicals.com",
+    ogImage: "https://aurabotanicals.com/images/og-image.jpg",
+    structuredData,
+  });
 
-      <main>
-        <SkipToContent />
-        <HeroSection />
-        <FeaturedProducts />
-        <WhyChooseUs />
-        <IngredientsDeepDive />
-        <HowItsMade />
-        <PhilosophySection />
-        <BenefitsOfNatural />
-        <TestimonialsSection />
-        <FaqSection />
-        <ContactSection />
-        <NewsletterSection />
-      </main>
-    </>
+  return (
+    <main>
+      <SkipToContent />
+      <HeroSection />
+      <FeaturedProducts />
+      <WhyChooseUs />
+      <IngredientsDeepDive />
+      <HowItsMade />
+      <PhilosophySection />
+      <BenefitsOfNatural />
+      <TestimonialsSection />
+      <FaqSection />
+      <ContactSection />
+      <NewsletterSection />
+    </main>
   );
 }
 
