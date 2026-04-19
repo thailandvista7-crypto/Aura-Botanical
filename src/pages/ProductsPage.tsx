@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { trpc } from "@/trpc/client";
+import { ShoppingBag } from "lucide-react";
 
 export default function ProductsPage() {
-  const [page, setPage] = useState(1);
+  const [page] = useState(1);
 
   const { data, isLoading } = trpc.product.list.useQuery({
     page,
@@ -22,21 +23,36 @@ export default function ProductsPage() {
         <p>No products found</p>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: 20,
+        }}
+      >
         {products.map((product) => {
           return (
             <div key={product.id}>
+              {/* ✅ FIXED LINK */}
               <Link to={/products/${product.id}}>
                 <img
                   src={product.image}
                   alt={product.name}
-                  style={{ width: "100%", height: 200, objectFit: "cover" }}
+                  style={{
+                    width: "100%",
+                    height: 200,
+                    objectFit: "cover",
+                  }}
                 />
               </Link>
 
               <h3>{product.name}</h3>
 
               <p>{"$" + (product.price / 100).toFixed(2)}</p>
+
+              <button style={{ marginTop: 8 }}>
+                <ShoppingBag size={14} /> Add
+              </button>
             </div>
           );
         })}
