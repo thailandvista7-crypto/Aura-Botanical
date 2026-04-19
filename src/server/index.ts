@@ -6,7 +6,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import jwt from "jsonwebtoken";
 import { db } from "../db";
-import { users, products } from "../db/schema"; // ✅ added products
+import { users, products } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { appRouter } from "../trpc/routers/_app";
 import { createContext } from "../trpc/trpc";
@@ -17,10 +17,12 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || "";
 
 const app = express();
 
+/* ================= CORS FIX ================= */
 app.use(cors({
-  origin: process.env.NODE_ENV === "production" ? true : "http://localhost:5173",
+  origin: "http://localhost:3000",
   credentials: true,
 }));
+
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(express.json());
@@ -91,7 +93,7 @@ app.use(
 /* ================= SEED ================= */
 app.post("/api/seed", async (_req, res) => {
   try {
-    // 👤 Admin
+    // Admin
     const existingUsers = await db.select().from(users);
     if (existingUsers.length === 0) {
       await db.insert(users).values({
@@ -101,28 +103,31 @@ app.post("/api/seed", async (_req, res) => {
       });
     }
 
-    // 🛍 PRODUCTS
+    // Products
     const existingProducts = await db.select().from(products);
 
     if (existingProducts.length === 0) {
       await db.insert(products).values([
-        { name: "Lavender Soap", description: "Relaxing lavender herbal soap", price: 899, image: "/images/p1.jpg", category: "soap", inStock: true },
-        { name: "Rose Soap", description: "Soft rose skin soap", price: 799, image: "/images/p2.jpg", category: "soap", inStock: true },
-        { name: "Charcoal Soap", description: "Deep cleansing charcoal soap", price: 999, image: "/images/p3.jpg", category: "soap", inStock: true },
-        { name: "Mint Soap", description: "Cooling mint herbal soap", price: 850, image: "/images/p4.jpg", category: "soap", inStock: true },
-        { name: "Turmeric Soap", description: "Brightening turmeric soap", price: 950, image: "/images/p5.jpg", category: "soap", inStock: true },
+        // SOAPS
+        { name: "Lavender Soap", description: "Relaxing lavender herbal soap", price: 899, image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108", category: "soap", inStock: true },
+        { name: "Rose Soap", description: "Soft rose skin soap", price: 799, image: "https://images.unsplash.com/photo-1585386959984-a41552231658", category: "soap", inStock: true },
+        { name: "Charcoal Soap", description: "Deep cleansing charcoal soap", price: 999, image: "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb", category: "soap", inStock: true },
+        { name: "Mint Soap", description: "Cooling mint herbal soap", price: 850, image: "https://images.unsplash.com/photo-1590080875515-8ec64895b423", category: "soap", inStock: true },
+        { name: "Turmeric Soap", description: "Brightening turmeric soap", price: 950, image: "https://images.unsplash.com/photo-1615486363972-8c3b2b7c6f9c", category: "soap", inStock: true },
 
-        { name: "Vanilla Candle", description: "Sweet vanilla aroma candle", price: 1299, image: "/images/p6.jpg", category: "candle", inStock: true },
-        { name: "Rose Candle", description: "Romantic rose candle", price: 1399, image: "/images/p7.jpg", category: "candle", inStock: true },
-        { name: "Lavender Candle", description: "Relaxing lavender candle", price: 1499, image: "/images/p8.jpg", category: "candle", inStock: true },
-        { name: "Coconut Candle", description: "Tropical coconut scent", price: 1199, image: "/images/p9.jpg", category: "candle", inStock: true },
-        { name: "Sandalwood Candle", description: "Warm sandalwood fragrance", price: 1599, image: "/images/p10.jpg", category: "candle", inStock: true },
+        // CANDLES
+        { name: "Vanilla Candle", description: "Sweet vanilla aroma candle", price: 1299, image: "https://images.unsplash.com/photo-1603006905003-be475563bc59", category: "candle", inStock: true },
+        { name: "Rose Candle", description: "Romantic rose candle", price: 1399, image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c", category: "candle", inStock: true },
+        { name: "Lavender Candle", description: "Relaxing lavender candle", price: 1499, image: "https://images.unsplash.com/photo-1587049352851-8d4e89133924", category: "candle", inStock: true },
+        { name: "Coconut Candle", description: "Tropical coconut scent", price: 1199, image: "https://images.unsplash.com/photo-1612197528062-432c1c3f3a8f", category: "candle", inStock: true },
+        { name: "Sandalwood Candle", description: "Warm sandalwood fragrance", price: 1599, image: "https://images.unsplash.com/photo-1602874801006-6d1b6f7d98ae", category: "candle", inStock: true },
 
-        { name: "Mini Gift Set", description: "Small soap gift set", price: 1999, image: "/images/p11.jpg", category: "gift_set", inStock: true },
-        { name: "Luxury Gift Box", description: "Premium botanical set", price: 3499, image: "/images/p12.jpg", category: "gift_set", inStock: true },
-        { name: "Couple Gift Set", description: "Perfect couple combo", price: 2999, image: "/images/p13.jpg", category: "gift_set", inStock: true },
-        { name: "Spa Kit", description: "Home spa experience kit", price: 3999, image: "/images/p14.jpg", category: "gift_set", inStock: true },
-        { name: "Wellness Bundle", description: "Complete wellness package", price: 4599, image: "/images/p15.jpg", category: "gift_set", inStock: true },
+        // GIFT SETS
+        { name: "Mini Gift Set", description: "Small soap gift set", price: 1999, image: "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb", category: "gift_set", inStock: true },
+        { name: "Luxury Gift Box", description: "Premium botanical set", price: 3499, image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf", category: "gift_set", inStock: true },
+        { name: "Couple Gift Set", description: "Perfect couple combo", price: 2999, image: "https://images.unsplash.com/photo-1616627459659-75e9e63a4f6c", category: "gift_set", inStock: true },
+        { name: "Spa Kit", description: "Home spa experience kit", price: 3999, image: "https://images.unsplash.com/photo-1556228720-195a672e8a03", category: "gift_set", inStock: true },
+        { name: "Wellness Bundle", description: "Complete wellness package", price: 4599, image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108", category: "gift_set", inStock: true },
       ]);
     }
 
